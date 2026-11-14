@@ -4,7 +4,10 @@
  let installPrompt=null,registration=null,acceptUpdate=false;
  const buttons=[...document.querySelectorAll('[data-wb-install]')];
  const syncInstall=()=>buttons.forEach(b=>b.hidden=installed());
- const hideStartup=()=>document.getElementById('wb-startup')?.remove();
+ const startup=document.getElementById('wb-startup'),startupImage=startup?.querySelector('img');
+ const imageReady=startupImage?.decode?startupImage.decode().catch(()=>{}):Promise.resolve();
+ const visibleReady=imageReady.then(()=>{const at=performance.now();if(startup)startup.dataset.artVisibleAt=String(at);return at;});
+ const hideStartup=async()=>{const imageAt=await visibleReady;if(!startup)return;const remaining=Math.max(0,2200-(performance.now()-imageAt));setTimeout(()=>{startup.classList.add('is-leaving');setTimeout(()=>startup.remove(),340);},remaining);};
  Promise.resolve(window.__wbReady).then(hideStartup,hideStartup);
  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;syncInstall();});
  window.addEventListener('appinstalled',()=>{installPrompt=null;syncInstall();toast('已安装美化工作台');});

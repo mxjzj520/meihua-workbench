@@ -6,7 +6,7 @@
  const syncInstall=()=>buttons.forEach(b=>b.hidden=installed());
  const startup=document.getElementById('wb-startup'),startupImage=startup?.querySelector('img');
  const imageReady=startupImage?.decode?startupImage.decode().catch(()=>{}):Promise.resolve();
- const visibleReady=imageReady.then(()=>{const at=performance.now();if(startup)startup.dataset.artVisibleAt=String(at);return at;});
+ const visibleReady=imageReady.then(()=>new Promise(resolve=>requestAnimationFrame(()=>{const at=performance.now();if(startup){startup.classList.add('is-ready');startup.dataset.artVisibleAt=String(at);}resolve(at);})));
  const hideStartup=async()=>{const imageAt=await visibleReady;if(!startup)return;const remaining=Math.max(0,2200-(performance.now()-imageAt));setTimeout(()=>{startup.classList.add('is-leaving');setTimeout(()=>startup.remove(),340);},remaining);};
  Promise.resolve(window.__wbReady).then(hideStartup,hideStartup);
  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;syncInstall();});

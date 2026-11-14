@@ -16,10 +16,10 @@
 <meta name="description" content="为 SillyTavern 制作状态栏与开场白的美化工作台。作品在此浏览器保存。">
 <style>
 #wb-startup{position:fixed;inset:0;z-index:2147483647;background:#fff;display:grid;place-items:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-#wb-startup img{width:min(380px,78vw);height:auto;display:block;animation:wb-startup-enter .55s ease both}
+#wb-startup img{width:min(380px,78vw);height:auto;aspect-ratio:1192/686;display:block;opacity:0;transform:none;animation:none;transition:none}
+#wb-startup.is-ready img{opacity:1}
 #wb-startup.is-leaving{opacity:0;pointer-events:none;transition:opacity .32s ease}
-@keyframes wb-startup-enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){#wb-startup img{animation:none}#wb-startup.is-leaving{transition:none}}
+@media(prefers-reduced-motion:reduce){#wb-startup.is-leaving{transition:none}}
 #wb-startup[hidden],#wb-update[hidden]{display:none!important}
 #wb-update{position:fixed;z-index:10000;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:16px;max-width:calc(100vw - 28px);padding:12px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface,#fff);color:var(--ink);box-shadow:0 8px 32px #00000012;font:13px var(--ui-font)}
 #wb-update p{margin:0;white-space:nowrap}#wb-update .quiet-button{font-size:13px;padding:7px 12px}#wb-update svg{width:16px;height:16px}
@@ -1110,7 +1110,7 @@ body{position:fixed;top:var(--app-top,0px);left:0;right:0;width:100%;height:var(
 </style>
 </head>
 <body>
-<div id="wb-startup" aria-label="正在打开美化工作台" data-started="0"><script>window.__wbStartupAt=performance.now();</script><img src="./assets/startup-art.png" alt="" width="1191" height="685" fetchpriority="high" decoding="sync"></div>
+<div id="wb-startup" aria-label="正在打开美化工作台" ><img src="./assets/startup-art.png" alt="" width="1192" height="686" fetchpriority="high" decoding="sync"></div>
 <div class="app" id="app">
 <aside class="sidebar" id="projectNavigation" aria-label="项目导航">
   <div class="sidebar-top"><a class="brand" href="#" data-action="home" title="全部作品"><span class="brand-symbol" data-icon="layers"></span><span class="nav-label">美化工作台</span></a><button class="icon-button sidebar-toggle" id="sidebarToggle" data-action="toggle-sidebar" aria-controls="projectNavigation" aria-expanded="false" aria-label="展开项目栏" title="展开项目栏"><span data-icon="menu"></span></button></div>
@@ -1718,7 +1718,7 @@ case 'delete-message':p.messages=p.messages.filter(m=>m.id!==id);saveSoon();rend
 case 'context':showContext();break;
 case 'select-context-all':p.messages.forEach(m=>m.selected=true);saveSoon();renderMessages();renderCounts();showContext();break;
 case 'select-context-recent':p.messages.forEach((m,i)=>m.selected=i>=p.messages.length-8);saveSoon();renderMessages();renderCounts();showContext();break;
-case 'requirements':tab='resources';renderWork();break;
+case 'requirements':if(innerWidth<=720){$('#messageInput').blur();$('#workspace').classList.add('show-work');$$('.mobile-tabs button').forEach(x=>x.classList.toggle('active',x.dataset.tab==='work'));}tab='resources';renderWork();$('#workBody').focus({preventScroll:true});break;
 case 'save-requirements':p.requirements=$('#requirementsEditor').value;saveSoon();closeModal();$('#requirementsSummary').textContent=p.requirements?'制作要求 · 已记录':'添加制作要求';if(tab==='resources')renderResources();break;
 case 'requirements-suggestion':modal('制作要求建议',`<div class="diff-summary">你当前的要求</div><pre class="file-content">${esc(p.requirements)}</pre><div class="diff-summary">AI 的建议</div><textarea id="requirementsSuggestionEditor" class="form-input requirements-textarea">${esc(p.requirementsSuggestion)}</textarea>`,[{label:'保留当前要求',action:'close-modal'},{label:'采用建议内容',action:'adopt-requirements',primary:true}]);break;
 case 'adopt-requirements':p.requirements=$('#requirementsSuggestionEditor').value;p.requirementsSuggestion=null;saveSoon();closeModal();if(tab==='resources')renderResources();break;

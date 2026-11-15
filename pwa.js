@@ -5,9 +5,9 @@
  const buttons=[...document.querySelectorAll('[data-wb-install]')];
  const syncInstall=()=>buttons.forEach(b=>b.hidden=installed());
  const startup=document.getElementById('wb-startup'),startupImage=startup?.querySelector('img');
- const imageReady=startupImage?.decode?startupImage.decode().catch(()=>{}):Promise.resolve();
- const visibleReady=imageReady.then(()=>new Promise(resolve=>requestAnimationFrame(()=>{const at=performance.now();if(startup){startup.classList.add('is-ready');startup.dataset.artVisibleAt=String(at);}resolve(at);})));
- const hideStartup=async()=>{const imageAt=await visibleReady;if(!startup)return;const remaining=Math.max(0,2200-(performance.now()-imageAt));setTimeout(()=>{startup.classList.add('is-leaving');setTimeout(()=>startup.remove(),340);},remaining);};
+ const imageReady=document.hidden?Promise.resolve():(startupImage?.decode?startupImage.decode().catch(()=>{}):Promise.resolve());
+ const visibleReady=Promise.race([imageReady,new Promise(resolve=>setTimeout(resolve,1200))]).then(()=>{const at=performance.now();if(startup){startup.classList.add('is-ready');startup.dataset.artVisibleAt=String(at);}return at;});
+ const hideStartup=async()=>{const imageAt=await visibleReady;if(!startup)return;if(document.hidden){startup.remove();return;}const remaining=Math.max(0,2200-(performance.now()-imageAt));setTimeout(()=>{startup.classList.add('is-leaving');setTimeout(()=>startup.remove(),340);},remaining);};
  Promise.resolve(window.__wbReady).then(hideStartup,hideStartup);
  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;syncInstall();});
  window.addEventListener('appinstalled',()=>{installPrompt=null;syncInstall();toast('已安装美化工作台');});

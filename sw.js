@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_PREFIX='meihua-shell-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
-const CACHE=CACHE_PREFIX+'b02981eb12a44eb2';
+const CACHE=CACHE_PREFIX+'8d2c9e0c02674ba8';
 const ROOT=self.registration.scope;
 const SHELL=["index.html","manifest.webmanifest","pwa.js","assets/icon-180.png","assets/icon-192.png","assets/icon-512.png","assets/icon-1024.png","assets/startup-art.png"];
 self.addEventListener('install',event=>{event.waitUntil((async()=>{const cache=await caches.open(CACHE);await Promise.all(SHELL.map(async file=>{const url=new URL(file,ROOT).href;const response=await fetch(url,{cache:'no-store'});if(!response.ok)throw Error('Cannot cache '+file);await cache.put(url,response);}));})());});
